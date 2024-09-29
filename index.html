@@ -1,1 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leadership Principle Stories</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+    }
 
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    .question, .lp-keyword, .story {
+      display: none;
+      text-align: center;
+      font-size: 18px;
+      margin: 20px 0;
+    }
+
+    .story {
+      font-weight: bold;
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-container {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .btn-container button {
+      width: 45%;
+      display: inline-block;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 15px;
+      }
+      h1 {
+        font-size: 24px;
+      }
+      button {
+        font-size: 14px;
+        padding: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Leadership Principle Stories</h1>
+    <div class="question" id="question"></div>
+    <div class="lp-keyword" id="lp-keyword"></div>
+    <div class="story" id="story"></div>
+    <button id="next-btn">Start</button>
+
+    <div class="btn-container" id="repeat-skip-buttons">
+      <button id="repeat-btn">Repeat</button>
+      <button id="skip-btn">Skip</button>
+    </div>
+  </div>
+
+  <script>
+    const data = [
+      { question: "face a complex problem", lp: "Dive Deep, evaluate metric and data", story: "Early Cancer" },
+      { question: "find root cause of issue", lp: "Dive Deep, evaluate metric and data", story: "Early Cancer" },
+      { question: "in-depth thought analysis", lp: "Dive Deep, evaluate metric and data", story: "Early Cancer" },
+      { question: "issue you solved", lp: "Dive Deep, evaluate metric and data", story: "Early Cancer" },
+      { question: "metric identified for a change", lp: "Dive Deep, evaluate metric and data", story: "Early Cancer" },
+      { question: "in tension – tight deadline or resource constraint", lp: "Deliver Results", story: "Komatsu / Facial Rec" },
+      { question: "overcoming unanticipated obstacle", lp: "Deliver Results", story: "Komatsu / Facial Rec" },
+      { question: "exceed expectation", lp: "Deliver Results", story: "Komatsu / Facial Rec" },
+      { question: "halfway realized goal is not aligned", lp: "Deliver Results", story: "Komatsu / Facial Rec" },
+      { question: "unachievable mission or goal", lp: "Deliver Results", story: "Komatsu / Facial Rec" },
+      { question: "did not manage well leading delay", lp: "Deliver Results", story: "Komatsu / Facial Rec" },
+      { question: "took something significant outside area", lp: "Ownership, scalable, long term, accept mistakes", story: "Ignition" },
+      { question: "were about to miss commitment", lp: "Ownership, scalable, long term, accept mistakes", story: "Ignition" },
+      { question: "initiative to impact whole company but wasn’t within under any group", lp: "Ownership, scalable, long term, accept mistakes", story: "Ignition" },
+      { question: "sacrifice short term gain for long term goal", lp: "Ownership, scalable, long term, accept mistakes", story: "Ignition" },
+      { question: "transition project to new owner", lp: "Ownership, scalable, long term, accept mistakes", story: "Ignition" },
+      { question: "peer struggling and decided to step in", lp: "Ownership, scalable, long term, accept mistakes", story: "Ignition" },
+      { question: "needed deeper level of subject expertise", lp: "Learn and Be Curious", story: "Early Cancer" },
+      { question: "you worked outside comfort zone", lp: "Learn and Be Curious", story: "Early Cancer" },
+      { question: "didn't know how to solve issue", lp: "Learn and Be Curious", story: "Early Cancer" },
+      { question: "you did something to improve overall work effectiveness", lp: "Learn and Be Curious", story: "Early Cancer" },
+      { question: "explored new area of existing space", lp: "Learn and Be Curious", story: "Early Cancer" },
+      { question: "someone challenged you to think differently", lp: "Learn and Be Curious", story: "Early Cancer" },
+      { question: "used external trends to improve product", lp: "Learn and Be Curious", story: "Early Cancer" },
+      { question: "calculated risk for speedy decision", lp: "Bias for Action, quick decision", story: "Phable" },
+      { question: "tight deadline to consider all options", lp: "Bias for Action, quick decision", story: "Phable" },
+      { question: "quick decision without manager", lp: "Bias for Action, quick decision", story: "Phable" },
+      { question: "respond immediately to situation", lp: "Bias for Action, quick decision", story: "Phable" },
+      { question: "decide move forward or gather more info", lp: "Bias for Action, quick decision", story: "Phable" },
+      { question: "proactive approach to create impact", lp: "Bias for Action, quick decision", story: "Phable" },
+      { question: "complex problem but simple solution", lp: "Invent and Simplify", story: "Ignition/Early Cancer" },
+      { question: "most innovative thing – why innovative?", lp: "Invent and Simplify", story: "Ignition/Early Cancer" },
+      { question: "simplify for customer", lp: "Invent and Simplify", story: "Ignition/Early Cancer" },
+      { question: "you influenced new innovation", lp: "Invent and Simplify", story: "Ignition/Early Cancer" },
+      { question: "issue usual approach won’t work", lp: "Invent and Simplify", story: "Ignition/Early Cancer" },
+      { question: "difficult interaction with customer", lp: "Customer Obsession, work backward, delight customer", story: "Activa Finance/RTR" },
+      { question: "above and beyond for customer", lp: "Customer Obsession, work backward, delight customer", story: "Activa Finance/RTR" },
+      { question: "anticipate customer need before they know", lp: "Customer Obsession, work backward, delight customer", story: "Activa Finance/RTR" },
+      { question: "asked customer feedback", lp: "Customer Obsession, work backward, delight customer", story: "Activa Finance/RTR" },
+      { question: "evaluated customer experience for your product", lp: "Customer Obsession, work backward, delight customer", story: "Activa Finance/RTR" },
+      { question: "unjustifiable customer demand which won’t address their need", lp: "Customer Obsession, work backward, delight customer", story: "Activa Finance/RTR" },
+      { question: "balance need of customers and needs of the business", lp: "Customer Obsession, work backward, delight customer", story: "Activa Finance/RTR" },
+      { question: "strongly disagree manager or peer", lp: "Have Backbone, disagree using data", story: "Phable/Warrant" },
+      { question: "unpopular stance", lp: "Have Backbone, disagree using data", story: "Phable/Warrant" },
+      { question: "commit to a disagreed decision", lp: "Have Backbone, disagree using data", story: "Phable/Warrant" },
+      { question: "felt strong but team went different direction", lp: "Have Backbone, disagree using data", story: "Phable/Warrant" },
+      { question: "pushed back against a negative decision", lp: "Have Backbone, disagree using data", story: "Phable/Warrant" },
+      { question: "great idea but team did not take it", lp: "Have Backbone, disagree using data", story: "Phable/Warrant" },
+      { question: "gain because you pushed for long time", lp: "Have Backbone, disagree using data", story: "Phable/Warrant" },
+      { question: "didn't have enough or right data", lp: "Are Right A Lot, ambiguity", story: "Ubitricity/Activa Finance" },
+      { question: "input from many sources", lp: "Are Right A Lot, ambiguity", story: "Ubitricity/Activa Finance" },
+      { question: "made a mistake (bad decision or bad idea or bad judgement)", lp: "Are Right A Lot, ambiguity", story: "Ubitricity/Activa Finance" },
+      { question: "need different perspective", lp: "Are Right A Lot, ambiguity", story: "Ubitricity/Activa Finance" },
+      { question: "communicate change in direction", lp: "Earn Trust, accept feedback", story: "RTR/Warrant" },
+      { question: "received critical feedback", lp: "Earn Trust, accept feedback", story: "RTR/Warrant" },
+      { question: "influence a peer with differing opinion", lp: "Earn Trust, accept feedback", story: "RTR/Warrant" },
+      { question: "not able to make commitment", lp: "Earn Trust, accept feedback", story: "RTR/Warrant" },
+      { question: "your team out of alignment with other team", lp: "Earn Trust, accept feedback", story: "RTR/Warrant" },
+      { question: "uncovered a significant problem in your team", lp: "Earn Trust, accept feedback", story: "RTR/Warrant" },
+      { question: "improve morale and productivity of your team", lp: "Earn Trust, accept feedback", story: "RTR/Warrant" },
+      { question: "peer struggling at work", lp: "Earn Trust, accept feedback", story: "RTR/Warrant" }
+    ];
+
+    let usedIndices = [];
+    let skippedIndices = [];
+    let currentStep = 0;
+    let currentData;
+
+    document.getElementById('next-btn').addEventListener('click', function() {
+      if (currentStep === 0) {
+        showRandomQuestion();
+      } else if (currentStep === 1) {
+        showLPAndKeyword();
+      } else if (currentStep === 2) {
+        showStory();
+      }
+    });
+
+    document.getElementById('repeat-btn').addEventListener('click', function() {
+      showStory();
+    });
+
+    document.getElementById('skip-btn').addEventListener('click', function() {
+      skipQuestion();
+    });
+
+    function showRandomQuestion() {
+      if (usedIndices.length === data.length) {
+        alert("All questions exhausted.");
+        usedIndices = [];
+        skippedIndices = [];
+        document.getElementById('repeat-skip-buttons').style.display = 'none';
+        document.getElementById('next-btn').textContent = "Restart";
+        return;
+      }
+
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * data.length);
+      } while (usedIndices.includes(randomIndex) || skippedIndices.includes(randomIndex));
+
+      usedIndices.push(randomIndex);
+      currentData = data[randomIndex];
+
+      document.getElementById('question').textContent = currentData.question;
+      document.getElementById('question').style.display = "block";
+      document.getElementById('lp-keyword').style.display = "none";
+      document.getElementById('story').style.display = "none";
+
+      document.getElementById('next-btn').textContent = "Show LP & Keyword";
+      document.getElementById('repeat-skip-buttons').style.display = 'none';
+      currentStep = 1;
+    }
+
+    function showLPAndKeyword() {
+      document.getElementById('lp-keyword').textContent = currentData.lp;
+      document.getElementById('lp-keyword').style.display = "block";
+      document.getElementById('next-btn').textContent = "Show Story";
+      currentStep = 2;
+    }
+
+    function showStory() {
+      document.getElementById('story').textContent = currentData.story;
+      document.getElementById('story').style.display = "block";
+      document.getElementById('next-btn').textContent = "Next Question";
+      document.getElementById('repeat-skip-buttons').style.display = 'block';
+      currentStep = 0;
+    }
+
+    function skipQuestion() {
+      skippedIndices.push(usedIndices.pop());
+      showRandomQuestion();
+    }
+  </script>
+  
+</body>
+</html>
