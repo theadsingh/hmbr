@@ -3,74 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flashcard Game</title>
+    <title>LP Flashcard Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f4f4f9;
-        }
-
-        .card {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 80%;
-            max-width: 500px;
-            padding: 20px;
             text-align: center;
-            margin-bottom: 20px;
+            margin-top: 50px;
         }
-
+        .card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 20px;
+            width: 80%;
+            margin: auto;
+        }
         button {
             margin: 10px;
-            padding: 15px 25px;
+            padding: 10px 20px;
             font-size: 16px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
         }
-
-        button.done {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        button.repeat {
-            background-color: #ff9800;
-            color: white;
-        }
-
-        button:hover {
-            opacity: 0.8;
-        }
-
-        .counter {
+        .progress {
             margin: 10px;
-            font-size: 18px;
         }
     </style>
 </head>
 <body>
 
-    <div class="card" id="cardContent">
-        <h3 id="flashcardText">Loading question...</h3>
-    </div>
+<h1>LP Flashcard Game</h1>
+<div class="card" id="card">
+    <p id="content"></p>
+    <button onclick="showNext()">Next</button>
+</div>
 
-    <div>
-        <button class="done" onclick="markDone()">Done</button>
-        <button class="repeat" onclick="repeatQuestion()">Repeat</button>
-    </div>
+<div class="progress">
+    <p id="progress">Progress: 0 / 60</p>
+    <p id="correct">Correct Answers: 0</p>
+</div>
 
-    <div class="counter" id="counterText">Questions Remaining: 0</div>
-
-   <script>
+<script>
     const questions = [
         { question: "face a complex problem", story: "Early Cancer", lp: "Dive Deep\nEvaluate metric and data" },
         { question: "find root cause of issue", story: "Early Cancer", lp: "Dive Deep\nEvaluate metric and data" },
@@ -134,58 +104,43 @@
         { question: "improve morale and productivity of your team / peer struggling at work", story: "Visby", lp: "Earn Trust\nAccept feedback / acknowledge mistake" }
     ];
 
-
-        let remainingQuestions = [...questions];
-        let currentStage = 'question'; // stages: 'question', 'story', 'lp'
-        let currentQuestionIndex = 0;
-
-        function updateCounter() {
-            document.getElementById('counterText').innerText = `Questions Remaining: ${remainingQuestions.length}`;
+    let currentIndex = 0;
+    let correctAnswers = 0;
+    let shuffledData = shuffle([...data]);
+    let currentStage = 0;  // 0: Show Question, 1: Show Story, 2: Show LP Keyword
+    
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
         }
+        return array;
+    }
 
-        function showNext() {
-            if (remainingQuestions.length === 0) {
-                document.getElementById('flashcardText').innerText = "All questions are done!";
-                return;
-            }
-            currentQuestionIndex = Math.floor(Math.random() * remainingQuestions.length);
-            const currentQuestion = remainingQuestions[currentQuestionIndex];
-            if (currentStage === 'question') {
-                document.getElementById('flashcardText').innerText = `Question: ${currentQuestion.question}`;
-                currentStage = 'story';
-            } else if (currentStage === 'story') {
-                document.getElementById('flashcardText').innerText = `Story: ${currentQuestion.story}`;
-                currentStage = 'lp';
-            } else if (currentStage === 'lp') {
-                document.getElementById('flashcardText').innerText = `LP Keyword: ${currentQuestion.lp}`;
-                currentStage = 'done';
-            } else {
-                showNext();
-            }
+    function showNext() {
+        if (currentIndex >= shuffledData.length) {
+            alert("All questions are answered!");
+            return;
         }
-
-        function markDone() {
-            if (currentStage === 'done') {
-                remainingQuestions.splice(currentQuestionIndex, 1);
-                currentStage = 'question';
-                updateCounter();
-                showNext();
-            }
+        const currentItem = shuffledData[currentIndex];
+        if (currentStage === 0) {
+            document.getElementById('content').innerHTML = `Question: ${currentItem.question}`;
+            currentStage = 1;
+        } else if (currentStage === 1) {
+            document.getElementById('content').innerHTML = `Story: ${currentItem.story}`;
+            currentStage = 2;
+        } else if (currentStage === 2) {
+            document.getElementById('content').innerHTML = `LP Keyword: ${currentItem.keyword}`;
+            currentStage = 0;
+            currentIndex++;
+            updateProgress();
         }
+    }
 
-        function repeatQuestion() {
-            if (currentStage === 'done') {
-                currentStage = 'question';
-                showNext();
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            updateCounter();
-            showNext();
-        });
-    </script>
+    function updateProgress() {
+        document.getElementById('progress').innerHTML = `Progress: ${currentIndex} / ${data.length}`;
+    }
+</script>
 
 </body>
 </html>
-
