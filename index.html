@@ -23,7 +23,7 @@
             font-size: 16px;
         }
         .progress {
-            margin: 10px;
+            margin: 20px;
         }
     </style>
 </head>
@@ -32,14 +32,14 @@
 <h1>LP Flashcard Game</h1>
 <div class="card" id="card">
     <p id="content"></p>
-    <button onclick="markCorrect()">Correct</button>
-    <button onclick="markIncorrect()">Incorrect</button>
+</div>
+<div id="buttons">
     <button onclick="showNext()">Next</button>
 </div>
 
 <div class="progress">
-    <p id="progress">Progress: 0 / 60</p>
-    <p id="correct">Correct Answers: 0</p>
+    <p id="progress">Remaining in Pool: 60</p>
+    <p id="correctCount">Correct Answers: 0</p>
 </div>
 
 <script>
@@ -106,55 +106,70 @@
         { question: "improve morale and productivity of your team / peer struggling at work", story: "Visby", lp: "Earn Trust\nAccept feedback / acknowledge mistake" }
     ];
 
+
     let currentIndex = 0;
     let correctAnswers = 0;
-    let shuffledData = shuffle([...questions]);
-    let currentStage = 0;  // 0: Show Question, 1: Show Story, 2: Show LP Keyword
-
-    function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
+    let remainingQuestions = [...questions];  // Questions in pool
 
     function showNext() {
-        if (currentIndex >= shuffledData.length) {
-            alert("All questions are answered!");
-            return;
+        const currentItem = remainingQuestions[currentIndex];
+        if (document.getElementById('buttons').children.length === 1) {  // Show Story after Question
+            document.getElementById('content').innerHTML = currentItem.story;
+            showLPButtons();
+        } else if (document.getElementById('buttons').children.length === 2) {  // Show LP after Story
+            document.getElementById('content').innerHTML = currentItem.lp;
+            showCorrectIncorrectButtons();
         }
-        const currentItem = shuffledData[currentIndex];
-        if (currentStage === 0) {
-            document.getElementById('content').innerHTML = `Question: ${currentItem.question}`;
-            currentStage = 1;
-        } else if (currentStage === 1) {
-            document.getElementById('content').innerHTML = `Story: ${currentItem.story}`;
-            currentStage = 2;
-        } else if (currentStage === 2) {
-            document.getElementById('content').innerHTML = `LP Keyword: ${currentItem.lp}`;
-            currentStage = 0;
-            currentIndex++;
-            updateProgress();
-        }
+    }
+
+    function showLPButtons() {
+        const nextButton = document.createElement("button");
+        nextButton.textContent = "Show LP";
+        nextButton.onclick = showNext;
+        document.getElementById('buttons').innerHTML = '';
+        document.getElementById('buttons').appendChild(nextButton);
+    }
+
+    function showCorrectIncorrectButtons() {
+        const correctButton = document.createElement("button");
+        correctButton.textContent = "Correct";
+        correctButton.onclick = markCorrect;
+
+        const incorrectButton = document.createElement("button");
+        incorrectButton.textContent = "Incorrect";
+        incorrectButton.onclick = markIncorrect;
+
+        document.getElementById('buttons').innerHTML = '';
+        document.getElementById('buttons').appendChild(correctButton);
+        document.getElementById('buttons').appendChild(incorrectButton);
     }
 
     function markCorrect() {
         correctAnswers++;
-        document.getElementById('correct').innerHTML = `Correct Answers: ${correctAnswers}`;
+        document.getElementById('correctCount').innerHTML = `Correct Answers: ${correctAnswers}`;
+        remainingQuestions.splice(currentIndex, 1);  // Remove correct question from pool
+        if (remainingQuestions.length === 0) {
+            alert("All questions answered correctly! Starting over.");
+            remainingQuestions = [...questions];
+            correctAnswers = 0;
+        }
+        resetForNext();
     }
 
     function markIncorrect() {
-        // You can keep track of incorrect answers here, if necessary.
-        alert("Incorrect answer. Keep going!");
+        alert("Keep practicing this one!");
+        resetForNext();
     }
 
-    function updateProgress() {
-        document.getElementById('progress').innerHTML = `Progress: ${currentIndex} / ${shuffledData.length}`;
+    function resetForNext() {
+        currentIndex = (currentIndex + 1) % remainingQuestions.length;  // Move to next question
+        document.getElementById('content').innerHTML = remainingQuestions[currentIndex].question;  // Show next question
+        document.getElementById('buttons').innerHTML = '<button onclick="showNext()">Next</button>';
+        document.getElementById('progress').innerHTML = `Remaining in Pool: ${remainingQuestions.length}`;
     }
 
-    // Initialize the first flashcard
-    showNext();
+    // Initialize with the first question
+    resetForNext();
 </script>
 
 </body>
