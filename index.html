@@ -42,6 +42,7 @@
     <p id="correctCount">Correct Answers: 0</p>
 </div>
 
+
 <script>
     const questions = [
         { question: "face a complex problem", story: "Early Cancer", lp: "Dive Deep\nEvaluate metric and data" },
@@ -106,7 +107,6 @@
         { question: "improve morale and productivity of your team / peer struggling at work", story: "Visby", lp: "Earn Trust\nAccept feedback / acknowledge mistake" }
     ];
 
-
     let currentIndex = 0;
     let correctAnswers = 0;
     let remainingQuestions = [...questions];  // Questions in pool
@@ -115,14 +115,14 @@
         const currentItem = remainingQuestions[currentIndex];
         if (document.getElementById('buttons').children.length === 1) {  // Show Story after Question
             document.getElementById('content').innerHTML = currentItem.story;
-            showLPButtons();
+            showLPButton();
         } else if (document.getElementById('buttons').children.length === 2) {  // Show LP after Story
             document.getElementById('content').innerHTML = currentItem.lp;
             showCorrectIncorrectButtons();
         }
     }
 
-    function showLPButtons() {
+    function showLPButton() {
         const nextButton = document.createElement("button");
         nextButton.textContent = "Show LP";
         nextButton.onclick = showNext;
