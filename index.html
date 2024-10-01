@@ -106,7 +106,7 @@
 
     let currentIndex = 0;
     let correctAnswers = 0;
-    let shuffledData = shuffle([...data]);
+    let shuffledData = shuffle([...questions]);  // Use 'questions' instead of 'data'
     let currentStage = 0;  // 0: Show Question, 1: Show Story, 2: Show LP Keyword
     
     function shuffle(array) {
@@ -130,7 +130,7 @@
             document.getElementById('content').innerHTML = `Story: ${currentItem.story}`;
             currentStage = 2;
         } else if (currentStage === 2) {
-            document.getElementById('content').innerHTML = `LP Keyword: ${currentItem.keyword}`;
+            document.getElementById('content').innerHTML = `LP Keyword: ${currentItem.lp}`;
             currentStage = 0;
             currentIndex++;
             updateProgress();
@@ -138,7 +138,7 @@
     }
 
     function updateProgress() {
-        document.getElementById('progress').innerHTML = `Progress: ${currentIndex} / ${data.length}`;
+        document.getElementById('progress').innerHTML = `Progress: ${currentIndex} / ${shuffledData.length}`;
     }
 </script>
 
