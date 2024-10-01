@@ -6,76 +6,71 @@
     <title>Flashcard Game</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
+            font-family: Arial, sans-serif;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             height: 100vh;
+            margin: 0;
+            background-color: #f4f4f9;
         }
 
         .card {
-            background-color: #ffffff;
+            background-color: white;
             border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            max-width: 500px;
             padding: 20px;
-            max-width: 400px;
-            width: 90%;
             text-align: center;
-        }
-
-        h2 {
-            font-size: 1.5em;
-            color: #333;
             margin-bottom: 20px;
-            text-transform: capitalize;
-        }
-
-        p#remaining {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-            color: #666;
         }
 
         button {
-            background-color: #007bff;
+            margin: 10px;
+            padding: 15px 25px;
+            font-size: 16px;
+            border-radius: 8px;
             border: none;
-            border-radius: 5px;
-            padding: 12px 20px;
-            color: white;
-            font-size: 1em;
-            margin: 10px 5px;
             cursor: pointer;
-            text-transform: uppercase;
-            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
-            transition: background-color 0.3s;
+            transition: background-color 0.3s ease;
+        }
+
+        button.done {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        button.repeat {
+            background-color: #ff9800;
+            color: white;
         }
 
         button:hover {
-            background-color: #0056b3;
+            opacity: 0.8;
         }
 
-        button:active {
-            background-color: #004085;
-            box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.2);
-        }
-
-        button:focus {
-            outline: none;
+        .counter {
+            margin: 10px;
+            font-size: 18px;
         }
     </style>
 </head>
 <body>
 
-<div class="card" id="flashcard">
-    <h2 id="question"></h2>
-    <p id="remaining">Questions remaining: 0</p>
-    <button id="doneBtn">Done</button>
-    <button id="repeatBtn">Repeat</button>
-</div>
+    <div class="card" id="cardContent">
+        <h3 id="flashcardText">Loading question...</h3>
+    </div>
 
-<script>
+    <div>
+        <button class="done" onclick="markDone()">Done</button>
+        <button class="repeat" onclick="repeatQuestion()">Repeat</button>
+    </div>
+
+    <div class="counter" id="counterText">Questions Remaining: 0</div>
+
+   <script>
     const questions = [
         { question: "face a complex problem", story: "Early Cancer", lp: "Dive Deep\nEvaluate metric and data" },
         { question: "find root cause of issue", story: "Early Cancer", lp: "Dive Deep\nEvaluate metric and data" },
@@ -139,73 +134,58 @@
         { question: "improve morale and productivity of your team / peer struggling at work", story: "Visby", lp: "Earn Trust\nAccept feedback / acknowledge mistake" }
     ];
 
-    let currentIndex = 0;
-    let questionPool = [...questions];
-    let shownQuestions = [];
 
-    const questionElem = document.getElementById('question');
-    const doneBtn = document.getElementById('doneBtn');
-    const repeatBtn = document.getElementById('repeatBtn');
+        let remainingQuestions = [...questions];
+        let currentStage = 'question'; // stages: 'question', 'story', 'lp'
+        let currentQuestionIndex = 0;
 
-    function showQuestion() {
-        if (questionPool.length === 0) {
-            questionElem.innerText = "All questions completed!";
-            doneBtn.style.display = "none";
-            repeatBtn.style.display = "none";
-            return;
+        function updateCounter() {
+            document.getElementById('counterText').innerText = `Questions Remaining: ${remainingQuestions.length}`;
         }
 
-        currentIndex = Math.floor(Math.random() * questionPool.length);
-        const currentQuestion = questionPool[currentIndex];
-        questionElem.innerText = currentQuestion.question;
-        doneBtn.innerText = "Show Story";
-        repeatBtn.innerText = "Show Story";
-    }
-
-    function handleDone() {
-        const currentQuestion = questionPool[currentIndex];
-        if (doneBtn.innerText === "Show Story") {
-            questionElem.innerText = currentQuestion.story;
-            doneBtn.innerText = "Guess LP";
-            repeatBtn.innerText = "Guess LP";
-        } else if (doneBtn.innerText === "Guess LP") {
-            questionElem.innerText = currentQuestion.lp;
-            doneBtn.innerText = "Done";
-            repeatBtn.innerText = "Repeat";
-        } else {
-            questionPool.splice(currentIndex, 1);  // Remove from pool
-            shownQuestions.push(currentQuestion);
-            showQuestion();
-            updateCounter();  // Update remaining counter
+        function showNext() {
+            if (remainingQuestions.length === 0) {
+                document.getElementById('flashcardText').innerText = "All questions are done!";
+                return;
+            }
+            currentQuestionIndex = Math.floor(Math.random() * remainingQuestions.length);
+            const currentQuestion = remainingQuestions[currentQuestionIndex];
+            if (currentStage === 'question') {
+                document.getElementById('flashcardText').innerText = `Question: ${currentQuestion.question}`;
+                currentStage = 'story';
+            } else if (currentStage === 'story') {
+                document.getElementById('flashcardText').innerText = `Story: ${currentQuestion.story}`;
+                currentStage = 'lp';
+            } else if (currentStage === 'lp') {
+                document.getElementById('flashcardText').innerText = `LP Keyword: ${currentQuestion.lp}`;
+                currentStage = 'done';
+            } else {
+                showNext();
+            }
         }
-    }
 
-    function handleRepeat() {
-        const currentQuestion = questionPool[currentIndex];
-        if (repeatBtn.innerText === "Show Story") {
-            questionElem.innerText = currentQuestion.story;
-            doneBtn.innerText = "Guess LP";
-            repeatBtn.innerText = "Guess LP";
-        } else if (repeatBtn.innerText === "Guess LP") {
-            questionElem.innerText = currentQuestion.lp;
-            doneBtn.innerText = "Done";
-            repeatBtn.innerText = "Repeat";
-        } else {
-            showQuestion();  // Repeat the same question
+        function markDone() {
+            if (currentStage === 'done') {
+                remainingQuestions.splice(currentQuestionIndex, 1);
+                currentStage = 'question';
+                updateCounter();
+                showNext();
+            }
         }
-    }
 
-    function updateCounter() {
-        const remainingElem = document.getElementById('remaining');
-        remainingElem.innerText = `Questions remaining: ${questionPool.length}`;
-    }
+        function repeatQuestion() {
+            if (currentStage === 'done') {
+                currentStage = 'question';
+                showNext();
+            }
+        }
 
-    doneBtn.addEventListener('click', handleDone);
-    repeatBtn.addEventListener('click', handleRepeat);
-
-    showQuestion();  // Initialize first question
-    updateCounter();  // Initialize counter
-</script>
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCounter();
+            showNext();
+        });
+    </script>
 
 </body>
 </html>
+
