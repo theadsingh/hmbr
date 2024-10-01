@@ -32,6 +32,8 @@
 <h1>LP Flashcard Game</h1>
 <div class="card" id="card">
     <p id="content"></p>
+    <button onclick="markCorrect()">Correct</button>
+    <button onclick="markIncorrect()">Incorrect</button>
     <button onclick="showNext()">Next</button>
 </div>
 
@@ -106,9 +108,9 @@
 
     let currentIndex = 0;
     let correctAnswers = 0;
-    let shuffledData = shuffle([...questions]);  // Use 'questions' instead of 'data'
+    let shuffledData = shuffle([...questions]);
     let currentStage = 0;  // 0: Show Question, 1: Show Story, 2: Show LP Keyword
-    
+
     function shuffle(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -137,9 +139,22 @@
         }
     }
 
+    function markCorrect() {
+        correctAnswers++;
+        document.getElementById('correct').innerHTML = `Correct Answers: ${correctAnswers}`;
+    }
+
+    function markIncorrect() {
+        // You can keep track of incorrect answers here, if necessary.
+        alert("Incorrect answer. Keep going!");
+    }
+
     function updateProgress() {
         document.getElementById('progress').innerHTML = `Progress: ${currentIndex} / ${shuffledData.length}`;
     }
+
+    // Initialize the first flashcard
+    showNext();
 </script>
 
 </body>
