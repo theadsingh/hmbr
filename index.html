@@ -3,45 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LP Flashcard Game</title>
+    <title>Leadership Principle Quiz</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
+            margin: 20px;
         }
-        .card {
-            border: 1px solid #ccc;
+        .question-box {
+            border: 2px solid #ccc;
             padding: 20px;
-            margin: 20px;
-            width: 80%;
-            margin: auto;
+            margin-bottom: 20px;
+            border-radius: 5px;
         }
-        button {
-            margin: 10px;
+        .counter {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .btn {
             padding: 10px 20px;
-            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
-        .progress {
-            margin: 20px;
+        .btn:disabled {
+            background-color: #ccc;
         }
     </style>
 </head>
 <body>
 
-<h1>LP Flashcard Game</h1>
-<div class="card" id="card">
-    <p id="content"></p>
-</div>
-<div id="buttons">
-    <button onclick="showNext()">Next</button>
+<div class="question-box" id="question-box">
+    <div class="counter" id="counter"></div>
+    <div id="question">Loading question...</div>
+    <div id="story" style="margin-top: 20px; display: none;">Story: <span id="story-text"></span></div>
 </div>
 
-<div class="progress">
-    <p id="progress">Remaining in Pool: 60</p>
-    <p id="correctCount">Correct Answers: 0</p>
-</div>
-
+<button class="btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
 
 <script>
     const questions = [
@@ -107,70 +106,36 @@
         { question: "improve morale and productivity of your team / peer struggling at work", story: "Visby", lp: "Earn Trust\nAccept feedback / acknowledge mistake" }
     ];
 
-    let currentIndex = 0;
-    let correctAnswers = 0;
-    let remainingQuestions = [...questions];  // Questions in pool
+    let currentQuestionIndex = 0;
+    let askedQuestions = [];
+    let questionCounter = 0;
 
-    function showNext() {
-        const currentItem = remainingQuestions[currentIndex];
-        if (document.getElementById('buttons').children.length === 1) {  // Show Story after Question
-            document.getElementById('content').innerHTML = currentItem.story;
-            showLPButton();
-        } else if (document.getElementById('buttons').children.length === 2) {  // Show LP after Story
-            document.getElementById('content').innerHTML = currentItem.lp;
-            showCorrectIncorrectButtons();
+    function randomizeQuestions() {
+        return questions.sort(() => Math.random() - 0.5);
+    }
+
+    function nextQuestion() {
+        if (currentQuestionIndex < questions.length) {
+            const currentQuestion = questions[currentQuestionIndex];
+            document.getElementById('question').textContent = currentQuestion.question;
+            document.getElementById('story-text').textContent = currentQuestion.story;
+            document.getElementById('counter').textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
+            askedQuestions.push(currentQuestion);
+            currentQuestionIndex++;
+            questionCounter++;
+        } else {
+            document.getElementById('question').textContent = "All questions have been asked!";
+            document.getElementById('next-btn').disabled = true;
         }
+        document.getElementById('story').style.display = 'block';
     }
 
-    function showLPButton() {
-        const nextButton = document.createElement("button");
-        nextButton.textContent = "Show LP";
-        nextButton.onclick = showNext;
-        document.getElementById('buttons').innerHTML = '';
-        document.getElementById('buttons').appendChild(nextButton);
-    }
-
-    function showCorrectIncorrectButtons() {
-        const correctButton = document.createElement("button");
-        correctButton.textContent = "Correct";
-        correctButton.onclick = markCorrect;
-
-        const incorrectButton = document.createElement("button");
-        incorrectButton.textContent = "Incorrect";
-        incorrectButton.onclick = markIncorrect;
-
-        document.getElementById('buttons').innerHTML = '';
-        document.getElementById('buttons').appendChild(correctButton);
-        document.getElementById('buttons').appendChild(incorrectButton);
-    }
-
-    function markCorrect() {
-        correctAnswers++;
-        document.getElementById('correctCount').innerHTML = `Correct Answers: ${correctAnswers}`;
-        remainingQuestions.splice(currentIndex, 1);  // Remove correct question from pool
-        if (remainingQuestions.length === 0) {
-            alert("All questions answered correctly! Starting over.");
-            remainingQuestions = [...questions];
-            correctAnswers = 0;
-        }
-        resetForNext();
-    }
-
-    function markIncorrect() {
-        alert("Keep practicing this one!");
-        resetForNext();
-    }
-
-    function resetForNext() {
-        currentIndex = (currentIndex + 1) % remainingQuestions.length;  // Move to next question
-        document.getElementById('content').innerHTML = remainingQuestions[currentIndex].question;  // Show next question
-        document.getElementById('buttons').innerHTML = '<button onclick="showNext()">Next</button>';
-        document.getElementById('progress').innerHTML = `Remaining in Pool: ${remainingQuestions.length}`;
-    }
-
-    // Initialize with the first question
-    resetForNext();
+    window.onload = () => {
+        randomizeQuestions();
+        nextQuestion();
+    };
 </script>
 
 </body>
 </html>
+
