@@ -3,44 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leadership Principle Quiz</title>
+    <title>LP Question Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
         }
+
+        .container {
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
         .question-box {
-            border: 2px solid #ccc;
+            border: 1px solid #ccc;
             padding: 20px;
             margin-bottom: 20px;
-            border-radius: 5px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
         }
-        .counter {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .btn {
+
+        button {
             padding: 10px 20px;
-            background-color: #28a745;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
             color: white;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
         }
-        .btn:disabled {
+
+        button:disabled {
             background-color: #ccc;
         }
     </style>
 </head>
 <body>
 
-<div class="question-box" id="question-box">
-    <div class="counter" id="counter"></div>
-    <div id="question">Loading question...</div>
-    <div id="story" style="margin-top: 20px; display: none;">Story: <span id="story-text"></span></div>
+<div class="container">
+    <h2>Leadership Principle Question Game</h2>
+    <div id="counter">Question: 0/0</div>
+    <div class="question-box" id="question-box">
+        <p id="question"></p>
+        <p id="story"></p>
+        <p id="lp-keyword"></p>
+    </div>
+    <button id="next-btn" onclick="showNextQuestion()">Next Question</button>
 </div>
-
-<button class="btn" id="next-btn" onclick="nextQuestion()">Next Question</button>
 
 <script>
     const questions = [
@@ -106,36 +122,37 @@
         { question: "improve morale and productivity of your team / peer struggling at work", story: "Visby", lp: "Earn Trust\nAccept feedback / acknowledge mistake" }
     ];
 
-    let currentQuestionIndex = 0;
-    let askedQuestions = [];
-    let questionCounter = 0;
+    let remainingQuestions = [...questions];
+    let questionCount = 0;
 
-    function randomizeQuestions() {
-        return questions.sort(() => Math.random() - 0.5);
+    function updateCounter() {
+        document.getElementById('counter').innerText = `Question: ${questionCount}/${questions.length}`;
     }
 
-    function nextQuestion() {
-        if (currentQuestionIndex < questions.length) {
-            const currentQuestion = questions[currentQuestionIndex];
-            document.getElementById('question').textContent = currentQuestion.question;
-            document.getElementById('story-text').textContent = currentQuestion.story;
-            document.getElementById('counter').textContent = `Question ${currentQuestionIndex + 1} of ${questions.length}`;
-            askedQuestions.push(currentQuestion);
-            currentQuestionIndex++;
-            questionCounter++;
-        } else {
-            document.getElementById('question').textContent = "All questions have been asked!";
+    function showNextQuestion() {
+        if (remainingQuestions.length === 0) {
             document.getElementById('next-btn').disabled = true;
+            document.getElementById('question').innerText = "All questions exhausted!";
+            document.getElementById('story').innerText = "";
+            document.getElementById('lp-keyword').innerText = "";
+            return;
         }
-        document.getElementById('story').style.display = 'block';
+
+        const randomIndex = Math.floor(Math.random() * remainingQuestions.length);
+        const currentQuestion = remainingQuestions.splice(randomIndex, 1)[0];
+
+        document.getElementById('question').innerText = currentQuestion.question;
+        document.getElementById('story').innerText = "Story: " + currentQuestion.story;
+        document.getElementById('lp-keyword').innerText = "LP Keyword: " + currentQuestion.lpKeyword;
+
+        questionCount++;
+        updateCounter();
     }
 
-    window.onload = () => {
-        randomizeQuestions();
-        nextQuestion();
-    };
+    // Initialize
+    updateCounter();
+    showNextQuestion();
 </script>
 
 </body>
 </html>
-
