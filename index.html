@@ -1,64 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LP Question Game</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            text-align: center;
-            max-width: 500px;
-            width: 100%;
-        }
-
-        .question-box {
-            border: 1px solid #ccc;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-        }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
-
-        button:disabled {
-            background-color: #ccc;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LP Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .container {
+      width: 80%;
+      max-width: 600px;
+      text-align: center;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .counter {
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
-
-<div class="container">
-    <h2>Leadership Principle Question Game</h2>
-    <div id="counter">Question: 0/0</div>
-    <div class="question-box" id="question-box">
-        <p id="question"></p>
-        <p id="story"></p>
-        <p id="lp-keyword"></p>
+  <div class="container">
+    <div class="counter">
+      <span id="counter">0</span> questions left
     </div>
-    <button id="next-btn" onclick="showNextQuestion()">Next Question</button>
-</div>
+    <div id="question-container">
+      <p id="question"></p>
+      <button id="guess-story-btn">Guess Story</button>
+    </div>
+    <div id="story-container" style="display:none;">
+      <p id="story"></p>
+      <button id="guess-lp-btn">Guess LP Keyword</button>
+    </div>
+    <div id="lp-container" style="display:none;">
+      <p id="lp"></p>
+      <button id="next-question-btn">Next Question</button>
+    </div>
+  </div>
 
-<script>
+  <script>
     const questions = [
         { question: "face a complex problem", story: "Early Cancer", lp: "Dive Deep\nEvaluate metric and data" },
         { question: "find root cause of issue", story: "Early Cancer", lp: "Dive Deep\nEvaluate metric and data" },
@@ -122,37 +113,63 @@
         { question: "improve morale and productivity of your team / peer struggling at work", story: "Visby", lp: "Earn Trust\nAccept feedback / acknowledge mistake" }
     ];
 
-    let remainingQuestions = [...questions];
-    let questionCount = 0;
+    let currentIndex = -1;
+    let remainingQuestions = data.length;
+    let usedIndexes = [];
 
-    function updateCounter() {
-        document.getElementById('counter').innerText = `Question: ${questionCount}/${questions.length}`;
+    const questionContainer = document.getElementById('question-container');
+    const storyContainer = document.getElementById('story-container');
+    const lpContainer = document.getElementById('lp-container');
+
+    const questionElem = document.getElementById('question');
+    const storyElem = document.getElementById('story');
+    const lpElem = document.getElementById('lp');
+    const counterElem = document.getElementById('counter');
+
+    const guessStoryBtn = document.getElementById('guess-story-btn');
+    const guessLpBtn = document.getElementById('guess-lp-btn');
+    const nextQuestionBtn = document.getElementById('next-question-btn');
+
+    function getRandomQuestion() {
+      if (remainingQuestions === 0) {
+        alert("All questions completed!");
+        return;
+      }
+
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * data.length);
+      } while (usedIndexes.includes(randomIndex));
+
+      usedIndexes.push(randomIndex);
+      currentIndex = randomIndex;
+
+      questionElem.textContent = data[randomIndex].question;
+      remainingQuestions--;
+      counterElem.textContent = remainingQuestions;
     }
 
-    function showNextQuestion() {
-        if (remainingQuestions.length === 0) {
-            document.getElementById('next-btn').disabled = true;
-            document.getElementById('question').innerText = "All questions exhausted!";
-            document.getElementById('story').innerText = "";
-            document.getElementById('lp-keyword').innerText = "";
-            return;
-        }
+    guessStoryBtn.addEventListener('click', () => {
+      questionContainer.style.display = 'none';
+      storyContainer.style.display = 'block';
+      storyElem.textContent = data[currentIndex].story;
+    });
 
-        const randomIndex = Math.floor(Math.random() * remainingQuestions.length);
-        const currentQuestion = remainingQuestions.splice(randomIndex, 1)[0];
+    guessLpBtn.addEventListener('click', () => {
+      storyContainer.style.display = 'none';
+      lpContainer.style.display = 'block';
+      lpElem.textContent = data[currentIndex].lp;
+    });
 
-        document.getElementById('question').innerText = currentQuestion.question;
-        document.getElementById('story').innerText = "Story: " + currentQuestion.story;
-        document.getElementById('lp-keyword').innerText = "LP Keyword: " + currentQuestion.lpKeyword;
+    nextQuestionBtn.addEventListener('click', () => {
+      lpContainer.style.display = 'none';
+      questionContainer.style.display = 'block';
+      getRandomQuestion();
+    });
 
-        questionCount++;
-        updateCounter();
-    }
-
-    // Initialize
-    updateCounter();
-    showNextQuestion();
-</script>
-
+    // Initialize the first question
+    counterElem.textContent = remainingQuestions;
+    getRandomQuestion();
+  </script>
 </body>
 </html>
