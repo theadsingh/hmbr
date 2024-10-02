@@ -112,7 +112,6 @@
         { question: "uncovered a significant problem in your team", story: "Phable / Komatsu", lp: "Earn Trust\nAccept feedback / acknowledge mistake" },
         { question: "improve morale and productivity of your team / peer struggling at work", story: "Visby", lp: "Earn Trust\nAccept feedback / acknowledge mistake" }
     ];
-
     let currentIndex = -1;
     let remainingQuestions = data.length;
     let usedIndexes = [];
@@ -132,7 +131,8 @@
 
     function getRandomQuestion() {
       if (remainingQuestions === 0) {
-        alert("All questions completed!");
+        questionElem.textContent = "All questions completed!";
+        guessStoryBtn.style.display = 'none';
         return;
       }
 
@@ -173,3 +173,4 @@
   </script>
 </body>
 </html>
+
