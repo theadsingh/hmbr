@@ -1,54 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LP Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      width: 80%;
-      max-width: 600px;
-      text-align: center;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 1rem;
-      cursor: pointer;
-    }
-    .counter {
-      margin-bottom: 20px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Story Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        .question-box, .story-box, .lp-box {
+            margin: 20px 0;
+        }
+        .counter {
+            text-align: right;
+            font-weight: bold;
+        }
+        .button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="counter">
-      <span id="counter">0</span> questions left
-    </div>
-    <div id="question-container">
-      <p id="question"></p>
-      <button id="guess-story-btn">Guess Story</button>
-    </div>
-    <div id="story-container" style="display:none;">
-      <p id="story"></p>
-      <button id="guess-lp-btn">Guess LP Keyword</button>
-    </div>
-    <div id="lp-container" style="display:none;">
-      <p id="lp"></p>
-      <button id="next-question-btn">Next Question</button>
-    </div>
-  </div>
 
+    <div class="container">
+        <h1>Interactive Story Quiz</h1>
+        
+        <div class="counter">Question <span id="question-counter">1</span> of 12</div>
+        
+        <div class="question-box">
+            <strong>Question:</strong>
+            <p id="random-question">What question will appear here?</p>
+        </div>
+
+        <button class="button" onclick="showStory()">Guess Story</button>
+        <button class="button" onclick="showLP()">Guess LP</button>
+
+        <div class="story-box">
+            <strong>Story:</strong>
+            <p id="story">Story will appear here</p>
+        </div>
+
+        <div class="lp-box">
+            <strong>Leadership Principle (LP):</strong>
+            <p id="lp">LP will appear here</p>
+        </div>
+
+        <button class="button" onclick="nextQuestion()">Next Question</button>
+    </div>
+
+   
   <script>
     const questions = [
         { question: "face a complex problem", story: "Early Cancer", lp: "Dive Deep\nEvaluate metric and data" },
@@ -112,65 +131,49 @@
         { question: "uncovered a significant problem in your team", story: "Phable / Komatsu", lp: "Earn Trust\nAccept feedback / acknowledge mistake" },
         { question: "improve morale and productivity of your team / peer struggling at work", story: "Visby", lp: "Earn Trust\nAccept feedback / acknowledge mistake" }
     ];
-    let currentIndex = -1;
-    let remainingQuestions = data.length;
-    let usedIndexes = [];
 
-    const questionContainer = document.getElementById('question-container');
-    const storyContainer = document.getElementById('story-container');
-    const lpContainer = document.getElementById('lp-container');
+        let usedQuestions = [];
+        let currentQuestionIndex = 0;
+        let questionCounter = 1;
 
-    const questionElem = document.getElementById('question');
-    const storyElem = document.getElementById('story');
-    const lpElem = document.getElementById('lp');
-    const counterElem = document.getElementById('counter');
+        function getRandomQuestion() {
+            if (usedQuestions.length >= questions.length) {
+                alert("All questions have been shown!");
+                return;
+            }
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * questions.length);
+            } while (usedQuestions.includes(randomIndex));
+            
+            usedQuestions.push(randomIndex);
+            currentQuestionIndex = randomIndex;
+            
+            document.getElementById("random-question").innerText = questions[randomIndex].question;
+            document.getElementById("story").innerText = "Story will appear here";
+            document.getElementById("lp").innerText = "LP will appear here";
+        }
 
-    const guessStoryBtn = document.getElementById('guess-story-btn');
-    const guessLpBtn = document.getElementById('guess-lp-btn');
-    const nextQuestionBtn = document.getElementById('next-question-btn');
+        function showStory() {
+            document.getElementById("story").innerText = questions[currentQuestionIndex].story;
+        }
 
-    function getRandomQuestion() {
-      if (remainingQuestions === 0) {
-        questionElem.textContent = "All questions completed!";
-        guessStoryBtn.style.display = 'none';
-        return;
-      }
+        function showLP() {
+            document.getElementById("lp").innerText = questions[currentQuestionIndex].lp;
+        }
 
-      let randomIndex;
-      do {
-        randomIndex = Math.floor(Math.random() * data.length);
-      } while (usedIndexes.includes(randomIndex));
+        function nextQuestion() {
+            if (questionCounter < questions.length) {
+                questionCounter++;
+                document.getElementById("question-counter").innerText = questionCounter;
+                getRandomQuestion();
+            } else {
+                alert("All questions completed!");
+            }
+        }
 
-      usedIndexes.push(randomIndex);
-      currentIndex = randomIndex;
-
-      questionElem.textContent = data[randomIndex].question;
-      remainingQuestions--;
-      counterElem.textContent = remainingQuestions;
-    }
-
-    guessStoryBtn.addEventListener('click', () => {
-      questionContainer.style.display = 'none';
-      storyContainer.style.display = 'block';
-      storyElem.textContent = data[currentIndex].story;
-    });
-
-    guessLpBtn.addEventListener('click', () => {
-      storyContainer.style.display = 'none';
-      lpContainer.style.display = 'block';
-      lpElem.textContent = data[currentIndex].lp;
-    });
-
-    nextQuestionBtn.addEventListener('click', () => {
-      lpContainer.style.display = 'none';
-      questionContainer.style.display = 'block';
-      getRandomQuestion();
-    });
-
-    // Initialize the first question
-    counterElem.textContent = remainingQuestions;
-    getRandomQuestion();
-  </script>
+        // Initialize with the first question
+        getRandomQuestion();
+    </script>
 </body>
 </html>
-
